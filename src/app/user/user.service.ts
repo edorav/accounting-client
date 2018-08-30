@@ -26,9 +26,15 @@ export class UserService extends MyHttpClientService<User> {
   }
 
   public verifyToken(): Observable<User> {
-    return this.http.post(this.getEndPointUri() + 'verifyToken', {} , this.getHttpOptions()).pipe(map((res: User) => {
-        return res;
-    }));
+    return this.http.post(this.getEndPointUri() + 'verifyToken', {} , this.getHttpOptions())
+    .pipe(
+      tap(
+        (res: User) => res,
+        (error: Error) => {
+          this.authService.destroySession();
+          this.router.navigate(['/login']);
+        })
+    );
   }
 
   /** GET heroes from the server */
